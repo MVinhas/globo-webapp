@@ -42,11 +42,18 @@ resource "aws_instance" "main" {
     "Name" = "${local.name_prefix}-webapp-${count.index}"
   })
 
-  user_data_replace_on_change = true
-
   user_data = templatefile("./templates/userdata.sh", {
     playbook_repository = var.playbook_repository
   })
+
+}
+
+resource "terraform_data" "webapp" {
+
+  triggers_replace = [
+    length(aws_instance.main.*.id),
+    join(",", aws_instance.main.*.id),
+  ]
 
 }
 
